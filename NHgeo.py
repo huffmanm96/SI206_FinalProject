@@ -4,8 +4,11 @@
 ## is the key, and the value is a dictionary of all the other points in it's radius.
 import csv
 import pickle
+import sqlite3
+import time
 
-sm_data = open('NH_GeoCodes_1.csv','r')
+
+sm_data = open('NH_GeoCodes_test2.csv','rU')
 sm_d = csv.reader(sm_data)
 
 lines = []
@@ -16,7 +19,7 @@ sm_list = []
 for item in lines[1:]:
     sm_list.append( (float(item[2]), float(item[3])) )
 
-lg_data = open('NH_GeoCodes.csv','r')
+lg_data = open('NH_GeoCodes.csv','rU')
 lg_d = csv.reader(lg_data)
 
 rows = []
@@ -53,5 +56,28 @@ for s_tup in sm_list:
     counter +=1
 print (vals)
 
-with open('NH_geo_data.txt', 'wb') as handle:
-  pickle.dump(vals, handle)
+# with open('NH_geo_data.txt', 'wb') as handle:
+#   pickle.dump(vals, handle)
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
+for each_code in vals.items():
+    print (each_code)
+
+
+conn = sqlite3.connect('NHgeodata_1.sqlite')
+cur = conn.cursor()
+
+cur.execute('DROP TABLE IF EXISTS Geodata')
+cur.execute('CREATE TABLE Geodata (primary_address TEXT, in_radius TEXT)')
+for each_code in vals.items():
+    cur.execute('INSERT INTO Geodata VALUES (?, ?)', (str(each_code[0]), str(each_code[1])))
+
+conn.commit() 
+conn.close()
+
+
+
+
+
+
